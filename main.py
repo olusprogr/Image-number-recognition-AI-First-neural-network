@@ -2,27 +2,33 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist
 
+tf.debugging.set_log_device_placement(True)
 
+print(tf.config.list_physical_devices('GPU'))
+print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
-# 1. Daten laden und vorbereiten
+# 1. Load and preprocess MNIST dataset
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
+# Convert images to float32 and normalize to [0, 1]
 def normalize_images(images):
     return images.astype(np.float32) / 255.0
 
+# Reshape test amd train images to (num_samples, 28, 28, 1) for CNN input
 train_images = normalize_images(train_images)
 test_images = normalize_images(test_images)
 
 train_inputs = train_images.reshape((train_images.shape[0], -1))  # (60000, 784)
 test_inputs = test_images.reshape((test_images.shape[0], -1))     # (10000, 784)
 
-# 2. Netzwerk-Parameter
+# 2. Network parameter
 num_inputs = 784
 num_hidden = 64
 num_outputs = 10
 
-np.random.seed(42)  # für Reproduzierbarkeit
+np.random.seed(42)  # idk
 
+# Initialize weights and biases that can be configured during training
 weights_input_hidden1 = np.random.uniform(-0.5, 0.5, (64, 784))
 bias_hidden1 = np.random.uniform(-0.5, 0.5, (64,))
 
