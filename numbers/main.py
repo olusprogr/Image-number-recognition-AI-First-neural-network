@@ -2,6 +2,11 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist
 
+images, labels = extract_training_samples('letters')
+print(images.shape)  # z.B. (124800, 28, 28)
+print(labels.shape)  # (124800,)
+
+
 tf.debugging.set_log_device_placement(True)
 
 print(tf.config.list_physical_devices('GPU'))
