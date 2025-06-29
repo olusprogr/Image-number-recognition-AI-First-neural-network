@@ -1,5 +1,4 @@
 import tensorflow as tf
-
 import datasetloader as dl
 import neuralnetwork as nn
 import activation as act
