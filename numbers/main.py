@@ -1,10 +1,10 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.datasets import mnist
+from emnist import list_datasets, extract_training_samples, extract_test_samples
 
-images, labels = extract_training_samples('letters')
-print(images.shape)  # z.B. (124800, 28, 28)
-print(labels.shape)  # (124800,)
+
+list_dataset = list_datasets()
+print(list_dataset)  # ['byclass', 'bymerge', 'letters', 'mnist', 'balanced', 'digits', 'letters', 'mnist_byclass', 'mnist_bymerge']
 
 
 tf.debugging.set_log_device_placement(True)
@@ -13,35 +13,36 @@ print(tf.config.list_physical_devices('GPU'))
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 # 1. Load and preprocess MNIST dataset
-(train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+x_train, y_train = extract_training_samples(list_dataset[0])
+x_test, y_test = extract_test_samples(list_dataset[0])
 
 # Convert images to float32 and normalize to [0, 1]
 def normalize_images(images):
     return images.astype(np.float32) / 255.0
 
 # Reshape test amd train images to (num_samples, 28, 28, 1) for CNN input
-train_images = normalize_images(train_images)
-test_images = normalize_images(test_images)
+train_images = normalize_images(x_train)
+test_images = normalize_images(x_test)
 
 train_inputs = train_images.reshape((train_images.shape[0], -1))  # (60000, 784)
 test_inputs = test_images.reshape((test_images.shape[0], -1))     # (10000, 784)
 
 # 2. Network parameter
 num_inputs = 784
-num_hidden = 64
-num_outputs = 10
+num_hidden = 128
+num_outputs = 62
 
 np.random.seed(42)  # idk
 
 # Initialize weights and biases that can be configured during training
-weights_input_hidden1 = np.random.uniform(-0.5, 0.5, (64, 784))
-bias_hidden1 = np.random.uniform(-0.5, 0.5, (64,))
+weights_input_hidden1 = np.random.uniform(-0.5, 0.5, (num_hidden, 784))
+bias_hidden1 = np.random.uniform(-0.5, 0.5, (num_hidden,))
 
-weights_hidden1_hidden2 = np.random.uniform(-0.5, 0.5, (64, 64))
-bias_hidden2 = np.random.uniform(-0.5, 0.5, (64,))
+weights_hidden1_hidden2 = np.random.uniform(-0.5, 0.5, (num_hidden, num_hidden))
+bias_hidden2 = np.random.uniform(-0.5, 0.5, (num_hidden,))
 
-weights_hidden2_output = np.random.uniform(-0.5, 0.5, (10, 64))
-bias_output = np.random.uniform(-0.5, 0.5, (10,))
+weights_hidden2_output = np.random.uniform(-0.5, 0.5, (num_outputs, num_hidden))
+bias_output = np.random.uniform(-0.5, 0.5, (num_outputs,))
 
 
 # 3. Aktivierungsfunktionen
@@ -67,13 +68,13 @@ def forward(x):
 
 # 5. Training
 learning_rate = 0.005
-epochs = 20
+epochs = 5
 
 for epoch in range(epochs):
     total_loss = 0
     for i in range(len(train_inputs)):
         x = train_inputs[i]
-        y_true = train_labels[i]
+        y_true = y_train[i]
 
         # Forward Pass - hier alle 3 Outputs auspacken!
         hidden1_a, hidden2_a, output_a = forward(x)
@@ -129,7 +130,7 @@ correct = 0
 for i in range(len(test_inputs)):
     _, _, output_a = forward(test_inputs[i])  # Drei Werte zurückgeben
     pred = np.argmax(output_a)
-    if pred == test_labels[i]:
+    if pred == y_test[i]:
         correct += 1
 
 print(f"Testgenauigkeit: {correct / len(test_inputs) * 100:.2f}%")

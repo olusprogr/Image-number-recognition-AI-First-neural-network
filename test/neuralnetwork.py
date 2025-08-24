@@ -19,17 +19,27 @@ class NeuralNetwork:
         self.layer_names = list(self.hidden_layers.keys()) + ['output']
         self.layer_sizes = list(self.hidden_layers.values()) + [self.num_outputs]
 
-        # self.act = act.Operations()
+        print(self.layer_names)
+        print(self.layer_sizes)
 
-    
+
+
+
+    # Initialize weights and biases
+    # This method creates the weights and biases for each layer based on the specified sizes
+    # The weights are initialized with random values in the range [-0.5, 0.5]
+    # The biases are also initialized with random values in the same range
     def initialize_adaptive_weights_and_biases(self):
         input_size = self.num_inputs
         for layer_name, num_neurons in zip(self.layer_names, self.layer_sizes):
-            print(f"Creating layer: {layer_name} with {num_neurons} neurons")
+            print(f"Creating layer: {layer_name} with {num_neurons} neurons... Input size: {input_size}")
             self.weights.append(np.random.uniform(-0.5, 0.5, (num_neurons, input_size)))
             self.biases.append(np.random.uniform(-0.5, 0.5, (num_neurons,)))
             input_size = num_neurons
-        
+
+        # Implement the forward function using the activation operations
+        # This allows the forward function to use the correct weights and biases for each layer
+        print("Forward function is being implemented...")
         self.forward = act.Operations().implement_forward(
             weights=self.weights,
             biases=self.biases,
@@ -80,15 +90,21 @@ class NeuralNetwork:
                 decay_step = decay_epochs
                 learning_rate = initial_lr * (decay_rate ** (epoch // decay_step))
 
-            total_loss = 0 
+            total_loss = 0
+            correct_predictions = 0
+
             for i in range(len(train_inputs)):
-                if i % 10000 == 0:
+                if i % 10000 == 0 and i > 0:
                     print(f"Epoch {epoch+1}/{epochs} - Step {i}/{len(train_inputs)} - Loss so far: {total_loss/(i+1):.4f}", flush=True)
 
                     current_avg_loss = total_loss / (i + 1)
 
+                    accuracy_so_far = correct_predictions / (i + 1)
+
+                    print(accuracy_so_far)
+
                     if gui:
-                        gui.root.after(0, lambda loss=current_avg_loss: gui.update_plot(loss))
+                        gui.root.after(0, lambda loss=current_avg_loss, acc=accuracy_so_far: gui.update_plot(loss, cross_entropy=acc))
 
 
                 x = train_inputs[i]
@@ -97,6 +113,10 @@ class NeuralNetwork:
                 activations = self.forward(x)
 
                 output_a = activations[-1]  # Output Layer Activation
+
+                predicted_class = np.argmax(output_a)
+                if predicted_class == y_true:
+                    correct_predictions += 1
 
                 y_onehot = np.zeros(self.num_outputs)
                 y_onehot[y_true] = 1
@@ -130,9 +150,17 @@ class NeuralNetwork:
                     self.weights[layer_idx] -= learning_rate * grad_weights[layer_idx]
                     self.biases[layer_idx] -= learning_rate * grad_biases[layer_idx]
 
-                
+            avg_loss = total_loss / len(train_inputs)
+            accuracy = correct_predictions / len(train_inputs)
+
 
             print(f"Epoch {epoch+1}/{epochs} - Loss: {total_loss/len(train_inputs):.4f}")
+
+        print("Training complete.")
+        self.save(filename='trained_model.npz')
+
+        if gui:
+            gui.close()
 
             
 
@@ -145,18 +173,31 @@ class NeuralNetwork:
 
         np.savez(filename, **save_dict)
 
-    @staticmethod
-    def softmax(x):
-        e_x = np.exp(x - np.max(x))
-        return e_x / e_x.sum()
-
     def predict(self, img: np.ndarray) -> tuple:
-        activations = self.forward(img.flatten())
+        flat_img = img.flatten()
+        print("Input vector min/max:", flat_img.min(), flat_img.max())
+        activations = self.forward(flat_img)
         output = activations[-1]
-        probs = NeuralNetwork.softmax(output)
+        probs = act.Operations.softmax(output)
+        print("Softmax probabilities:", probs)
         predicted_class = np.argmax(probs)
         confidence = probs[predicted_class]
+        print(f"Predicted class: {predicted_class}, confidence: {confidence:.4f}")
         return predicted_class, confidence
+
+
+    def load(self, filename="trained_model.npz"):
+        data = np.load(filename)
+        self.weights = [data[f'weight_{i}'] for i in range(len(self.layer_sizes) - 1)]
+        self.biases = [data[f'bias_{i}'] for i in range(len(self.layer_sizes) - 1)]
+        
+        # Re-implement the forward function with the loaded weights and biases
+        self.forward = act.Operations().implement_forward(
+            weights=self.weights,
+            biases=self.biases,
+            layer_names=self.layer_names
+        )
+        print(f"Model loaded from {filename}")
 
 
 

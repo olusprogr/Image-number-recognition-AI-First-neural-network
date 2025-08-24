@@ -39,7 +39,7 @@ def forward(x):
     hidden2_z = np.dot(weights_hidden1_hidden2, hidden1_a) + bias_hidden2  # (64,)
     hidden2_a = relu(hidden2_z)
 
-    output_z = np.dot(weights_hidden2_output, hidden2_a) + bias_output    # (10,)
+    output_z = np.dot(weights_hidden2_output, hidden2_a) + bias_output    # (62,)
     output_a = softmax(output_z)
 
     return hidden1_a, hidden2_a, output_a
@@ -50,20 +50,32 @@ a1, a2, output_a = forward(img_flat)
 
 # === 5. Vorhersage ===
 
+# Mapping von Label zu Zeichen (EMNIST ByClass – 62 Klassen)
+emnist_classes = [
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+    'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+    'u', 'v', 'w', 'x', 'y', 'z'
+]
+
 for i, prob in enumerate(output_a):
-    print(f"Wahrscheinlichkeit für {i}: {prob:.4f}")
+    print(f"Wahrscheinlichkeit für '{emnist_classes[i]}': {prob:.4f}")
 
 digit = np.argmax(output_a)
+print(f"Vorhergesagtes Zeichen: '{emnist_classes[digit]}'")
 
-print(f"Vorhergesagte Ziffer: {digit}")
+true_char = input("Was war das tatsächliche Zeichen? (z. B. A, b, 3): ")
+true_label = emnist_classes.index(true_char)
 
-true_label = int(input("Was war die tatsächliche Zahl? (0-9): "))
 
 if digit != true_label:
     print("❌ Falsch erkannt. Lerne aus dem Fehler...")
 
     learning_rate = 0.01
-    y_true = np.zeros(10)
+    y_true = np.zeros(62)
     y_true[true_label] = 1
 
     error_output = output_a - y_true
