@@ -87,7 +87,7 @@ class DatasetLoader:
         elif 36 <= num <= 61:
             return chr(ord('a') + (num - 36))
         else:
-            raise ValueError("Nummer außerhalb des gültigen Bereichs 0-61")
+            raise ValueError("Nummer außerhalb des gültigen Bereichs 0-61", num)
 
 
 

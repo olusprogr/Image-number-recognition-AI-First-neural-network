@@ -44,7 +44,6 @@ bias_hidden2 = np.random.uniform(-0.5, 0.5, (num_hidden,))
 weights_hidden2_output = np.random.uniform(-0.5, 0.5, (num_outputs, num_hidden))
 bias_output = np.random.uniform(-0.5, 0.5, (num_outputs,))
 
-
 # 3. Aktivierungsfunktionen
 def relu(x):
     return np.maximum(0, x)

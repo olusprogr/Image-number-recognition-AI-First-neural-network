@@ -16,8 +16,7 @@ if __name__  == '__main__':
         num_inputs=784,
         hidden_layers={
             'hidden1': 128,
-            'hidden2': 64,
-            'hidden3': 32
+            'hidden2': 128
         },
         num_outputs=62
     )
@@ -30,6 +29,9 @@ if __name__  == '__main__':
         print("Normalizing dataset...")
         dl_instance.train_images = dl_instance.normalize_dataset(dl_instance.train_images) # (697932, 28, 28)
         dl_instance.test_images = dl_instance.normalize_dataset(dl_instance.test_images) # (116323, 28, 28)
+
+        if (dl_instance.train_images is None or dl_instance.test_images is None):
+            raise ValueError("Train or test images are None after normalization.")
 
         print(f"Train images shape: {dl_instance.train_images.shape}")  # (697932, 28, 28)
         print(f"Test images shape: {dl_instance.test_images.shape}")    # (116323, 28, 28)
@@ -51,9 +53,7 @@ if __name__  == '__main__':
         nn_model.load(filename='trained_model.npz')
 
         print("Loaded model weights and biases:")
-        print(nn_model.weights[-1])  # Output layer weights shape
         print(nn_model.biases[-1].shape)   # Output layer biases shape
-        print(nn_model.weights[-1][27])  # Layer names
 
 
     activation_ops = act.Operations()
@@ -63,7 +63,7 @@ if __name__  == '__main__':
             train_inputs=train_inputs,
             train_labels=dl_instance.train_labels,
             learning_rate=0.003,
-            epochs=5,
+            epochs=1,
             dynamic_learning_rate=True,
             decay_epochs=5
         )

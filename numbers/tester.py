@@ -11,12 +11,24 @@ img_flat = img_array.flatten()  # (784,)
 
 # === 2. Modell laden ===
 data = np.load("trained_model.npz")
-weights_input_hidden1 = data["weights_input_hidden1"]
-bias_hidden1 = data["bias_hidden1"]
-weights_hidden1_hidden2 = data["weights_hidden1_hidden2"]
-bias_hidden2 = data["bias_hidden2"]
-weights_hidden2_output = data["weights_hidden2_output"]
-bias_output = data["bias_output"]
+print("Gespeicherte Arrays:", list(data.keys()))
+
+# weights_input_hidden1 = data["weights_input_hidden1"]
+# bias_hidden1 = data["bias_hidden1"]
+# weights_hidden1_hidden2 = data["weights_hidden1_hidden2"]
+# bias_hidden2 = data["bias_hidden2"]
+# weights_hidden2_output = data["weights_hidden2_output"]
+# bias_output = data["bias_output"]
+
+weights_input_hidden1   = data["weight_0"]
+bias_hidden1            = data["bias_0"]
+
+weights_hidden1_hidden2 = data["weight_1"]
+bias_hidden2            = data["bias_1"]
+
+weights_hidden2_output  = data["weight_2"]
+bias_output             = data["bias_2"]
+
 
 
 # === 3. Aktivierungsfunktionen ===
@@ -100,12 +112,12 @@ if digit != true_label:
     bias_hidden1 -= learning_rate * grad_b1
 
     np.savez("trained_model.npz",
-             weights_input_hidden1=weights_input_hidden1,
-             bias_hidden1=bias_hidden1,
-             weights_hidden1_hidden2=weights_hidden1_hidden2,
-             bias_hidden2=bias_hidden2,
-             weights_hidden2_output=weights_hidden2_output,
-             bias_output=bias_output)
+             weight_0=weights_input_hidden1,
+             bias_0=bias_hidden1,
+             weight_1=weights_hidden1_hidden2,
+             bias_1=bias_hidden2,
+             weight_2=weights_hidden2_output,
+             bias_2=bias_output)
 
     print("✅ Fehler gelernt und Modell gespeichert.")
 else:

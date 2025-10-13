@@ -176,11 +176,10 @@ class NeuralNetwork:
 
     def predict(self, img: np.ndarray) -> tuple:
         flat_img = img.flatten()
-        print("Input vector min/max:", flat_img.min(), flat_img.max())
         activations = self.forward(flat_img)
         output = activations[-1]
         probs = act.Operations.softmax(output)
-        print("Softmax probabilities:", probs)
+        #print("Softmax probabilities:", probs)
         predicted_class = np.argmax(probs)
         confidence = probs[predicted_class]
         print(f"Predicted class: {predicted_class}, confidence: {confidence:.4f}")
