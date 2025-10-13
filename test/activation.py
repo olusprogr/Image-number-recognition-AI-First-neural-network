@@ -25,13 +25,14 @@ class Operations:
     # The function will apply the activation functions (ReLU, softmax, etc.) as specified
     @staticmethod
     def implement_forward(weights, biases, layer_names):
+        print(weights, biases, layer_names)
         def forward(x):
             activations = []
             for i, (w, b, name) in enumerate(zip(weights, biases, layer_names)):
                 z = np.dot(w, x) + b
-                print(f"Layer {name} - z min/max: {z.min()}, {z.max()}")
+                # print(f"Layer {name} - z min/max: {z.min()}, {z.max()}")
                 x = Operations.relu(z) if name != 'output' else Operations.softmax(z)
-                print(f"Layer {name} - activation min/max: {x.min()}, {x.max()}")
+                # print(f"Layer {name} - activation min/max: {x.min()}, {x.max()}")
                 activations.append(x)
             return activations
         return forward

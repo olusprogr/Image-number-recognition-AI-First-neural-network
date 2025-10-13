@@ -10,7 +10,7 @@ if tf.config.list_physical_devices('GPU'):
 
 if __name__  == '__main__':
 
-    # Initialize the neural network
+    # Initialize the neural network with specified parameters
     print("Initializing neural network...")
     nn_model = nn.NeuralNetwork(
         num_inputs=784,
@@ -58,18 +58,12 @@ if __name__  == '__main__':
 
     activation_ops = act.Operations()
 
-    forward = activation_ops.implement_forward(
-        weights=nn_model.weights,
-        biases=nn_model.biases,
-        layer_names=nn_model.layer_names
-    )
-
     if train:
         nn_model.train(
             train_inputs=train_inputs,
             train_labels=dl_instance.train_labels,
             learning_rate=0.003,
-            epochs=30,
+            epochs=5,
             dynamic_learning_rate=True,
             decay_epochs=5
         )

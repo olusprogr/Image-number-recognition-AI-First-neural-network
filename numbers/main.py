@@ -68,7 +68,7 @@ def forward(x):
 
 # 5. Training
 learning_rate = 0.005
-epochs = 5
+epochs = 10
 
 for epoch in range(epochs):
     total_loss = 0

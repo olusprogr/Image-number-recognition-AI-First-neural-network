@@ -111,6 +111,7 @@ class NeuralNetwork:
                 y_true = train_labels[i]
 
                 activations = self.forward(x)
+                #print(activations)
 
                 output_a = activations[-1]  # Output Layer Activation
 
