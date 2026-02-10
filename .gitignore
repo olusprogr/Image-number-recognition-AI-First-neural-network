@@ -1,2 +1,5 @@
 .venv
 test/venv
+.vscode
+numbers/venv
+test3/venv
