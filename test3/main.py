@@ -2,7 +2,7 @@ import tensorflow as tf
 import neuralnetwork as nn
 import datasetloader as dl
 
-train: bool = True
+train: bool = False
 
 if tf.config.list_physical_devices('GPU'):
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
@@ -13,8 +13,10 @@ if __name__ == "__main__":
     nn_model = nn.NeuralNetwork(
         num_input=784,
         hidden_layers={
-            'hidden1': 128,
-            'hidden2': 128
+            'hidden1': 512,
+            'hidden2': 256,
+            'hidden3': 128,
+            'hidden4': 64,
         },
         num_output=62
     )
@@ -41,7 +43,7 @@ if __name__ == "__main__":
         nn_model.load(filename='trained_model.npz')
 
     if train:
-        nn_model.train(train_inputs=dl_instance.train_inputs, train_labels=dl_instance.train_labels, learning_rate=0.001, epochs=10, dynamic_learning_rate=True, decay_epochs=4, batch_size=256)
+        nn_model.train(train_inputs=dl_instance.train_inputs, train_labels=dl_instance.train_labels, learning_rate=0.005, epochs=40, dynamic_learning_rate=True, decay_epochs=4, batch_size=128)
     
     else:
         print(nn_model.layer_names)

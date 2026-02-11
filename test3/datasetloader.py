@@ -46,25 +46,17 @@ class DatasetLoader:
     
     @staticmethod
     def load_image(filepath: str) -> np.ndarray:
-        # 1. Bild öffnen & in Graustufen konvertieren
         img = Image.open(filepath).convert('L')
-
-        # 2. Größe auf 28x28 ändern
         img = img.resize((28, 28))
-
-        # 3. PIL-Bild zu NumPy-Array umwandeln
-        img_array = np.array(img)
-
-        # 4. Normalisieren
-        img_array = DatasetLoader.normalize_images(img_array)
-
-        # 5. Zu (1, 28, 28) machen → ein einzelnes Bild in Stapel einbetten
-        img_array = np.expand_dims(img_array, axis=0)
-
-        # 6. Reshape zu (1, 784)
-        img_array = DatasetLoader.reshape_images(img_array)
-
-        return img_array
+        img_array = np.array(img).astype(np.float32)
+        
+        # Invertieren (EMNIST hat weiße Zeichen auf schwarz)
+        img_array = 255 - img_array
+        
+        # Normalisieren
+        img_array = img_array / 255.0
+        
+        return img_array  # Shape: (28, 28)
 
     @staticmethod
     def number_to_emnist_class(num: int) -> str:
